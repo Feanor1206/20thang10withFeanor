@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RainLove 💖</title>
+<style>
+  html,body{
+    margin:0;padding:0;overflow:hidden;
+    background:#000;color:#fff;font-family:'Poppins',sans-serif;
+  }
+  #msg{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    font-size:28px;
+    color:#f584b7;
+    text-shadow:0 0 10px #f584b7;
+  }
+  canvas{position:absolute;top:0;left:0;}
+  #playbtn{
+    position:absolute;bottom:20px;left:50%;
+    transform:translateX(-50%);
+    background:#f584b7;color:#fff;
+    border:none;padding:10px 20px;
+    border-radius:20px;cursor:pointer;
+  }
+  #playbtn:hover{opacity:.8;}
+</style>
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div id="msg">20/10 rảnh quá thì làm gì :))) Chúc tất cả nhé</div>
+<audio id="bg" loop></audio>
+<button id="playbtn">Phát nhạc 🎵</button>
+
+<script>
+
+function getParam(name){
+  const url=new URL(window.location.href);
+  return url.searchParams.get(name);
+}
+let dataRaw=getParam("id");
+let data={msg:"20/10 rảnh quá thì làm gì :))) Chúc tất cả nhé",rainText:"LOVE",rainColor:"#f584b7",music:""};
+if(dataRaw){
+  try{
+    data=JSON.parse(atob(dataRaw));
+  }catch(e){console.warn("Decode lỗi:",e);}
+}
+
+// ===== ÁP DỤNG DỮ LIỆU =====
+document.getElementById("msg").innerText=data.msg;
+document.getElementById("msg").style.color=data.rainColor;
+document.getElementById("msg").style.textShadow=`0 0 15px ${data.rainColor}`;
+document.getElementById("bg").src=data.music||"./assets/4.mp3";
+
+// ===== NÚT PHÁT NHẠC =====
+const bg=document.getElementById("bg");
+document.getElementById("playbtn").onclick=()=>{
+  bg.play();document.getElementById("playbtn").style.display="none";
+};
+
+// ===== HIỆU ỨNG MƯA =====
+const canvas=document.getElementById("rain");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+const chars=data.rainText.split("");
+const fontSize=18;
+const cols=Math.floor(canvas.width/fontSize);
+const drops=new Array(cols).fill(1);
+
+function draw(){
+  ctx.fillStyle="rgba(0,0,0,0.05)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle=data.rainColor;
+  ctx.font=fontSize+"px monospace";
+  for(let i=0;i<drops.length;i++){
+    const text=chars[Math.floor(Math.random()*chars.length)];
+    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+    if(drops[i]*fontSize>canvas.height && Math.random()>0.975)drops[i]=0;
+    drops[i]++;
+  }
+}
+setInterval(draw,33);
+
+window.onresize=()=>{
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+};
+</script>
+</body>
+</html>
